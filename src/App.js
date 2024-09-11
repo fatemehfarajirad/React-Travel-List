@@ -7,11 +7,17 @@ const initialItems = [
 ];
 
 export default function App() {
+  const [items, setItems] = useState(initialItems);
+
+  function handleAddItems(item) {
+    setItems((items) => [...items, item]);
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems} />
+      <PackingList items={items} />
       <Stats />
     </div>
   );
@@ -25,20 +31,26 @@ function Logo() {
   );
 }
 
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
 
-  const newItem = { description, quantity, packed: false, id: Date.now() };
-  console.log(newItem);
-
   function handleSubmit(e) {
     e.preventDefault();
+
+    if (!description) return;
+
+    const newItem = { description, quantity, packed: false, id: Date.now() };
+
+    onAddItems(newItem);
+
+    setDescription("");
+    setQuantity(1);
   }
 
   return (
     <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What do you need for you 😍 trip?</h3>
+      <h3>What do you need for your 😍 trip?</h3>
       <select
         value={quantity}
         onChange={(e) => setQuantity(Number(e.target.value))}
@@ -60,24 +72,24 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({ items }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
-          <Item obj={item} key={item.id} />
+        {items.map((item) => (
+          <Item item={item} key={item.id} />
         ))}
       </ul>
     </div>
   );
 }
 
-function Item({ obj }) {
+function Item({ item }) {
   return (
     <li>
-      <span style={obj.packed ? { textDecoration: "Line-through" } : {}}>
-        {obj.quantity}
-        {obj.description}{" "}
+      <span style={item.packed ? { textDecoration: "Line-through" } : {}}>
+        {item.quantity}
+        {item.description}
       </span>
       <button>❌&times</button>
     </li>
